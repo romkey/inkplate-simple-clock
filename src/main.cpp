@@ -1,5 +1,5 @@
 #include <Arduino.h>
-#include <Wifi.h>
+#include <WiFi.h>
 #include <time.h>
 
 #include <Inkplate.h>
