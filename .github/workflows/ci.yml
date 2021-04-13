@@ -36,6 +36,11 @@ jobs:
         pip install --upgrade platformio
         pio update
 
+    - name: Install board file
+      run:
+        mkdir ~/.platformio/boards
+        cp inkplate.json ~/.platformio/boards
+
     - name: Install library dependencies
       run: pio lib install
       

@@ -10,6 +10,10 @@
 
 static Inkplate display(INKPLATE_1BIT);
 
+static void ntp_update() {
+  configTime(GMT_OFFSET_SECS, DAYLIGHT_SAVINGS_OFFSET_SECS, "time.nist.gov", "0.pool.ntp.org", "1.pool.ntp.org");
+}
+
 void setup() {
   Serial.begin(115200);
 
@@ -20,6 +24,9 @@ void setup() {
     Serial.print('.');
     delay(1000);
   }
+
+  Serial.print("IP address ");
+  Serial.println(WiFi.localIP());
 
   display.begin();
   Serial.println("display.begin");
@@ -34,19 +41,22 @@ void setup() {
   display.print(WiFi.localIP());
   display.display();
 
-#define GMT_OFFSET_SECS  -8 * 60 * 60
-#define DAYLIGHT_SAVINGS_OFFSET_SECS 3600
-  configTime(GMT_OFFSET_SECS, DAYLIGHT_SAVINGS_OFFSET_SECS, "time.nist.gov", "0.pool.ntp.org", "1.pool.ntp.org");
+  ntp_update();
 }
 
-
 void loop() {
-  static int64_t next_update = 0;
+  static int64_t next_ntp_update = NTP_UPDATE_INTERVAL;
+  static int64_t next_display_update = 0;
 
-  if(next_update > esp_timer_get_time())
+  if(next_ntp_update < esp_timer_get_time()) {
+    next_ntp_update += NTP_UPDATE_INTERVAL;
+    ntp_update();
+  }
+
+  if(next_display_update > esp_timer_get_time())
     return;
 
-  next_update += 60 * 1000 * 1000;
+  next_display_update += DISPLAY_UPDATE_INTERVAL;
 
   struct tm timeinfo;
   if(!getLocalTime(&timeinfo)) {
