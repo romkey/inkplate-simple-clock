@@ -38,7 +38,7 @@ jobs:
 
     - name: Install board file
       run:
-        mkdir ~/.platformio/boards
+        mkdir ~/.platformio/boards &&
         cp inkplate.json ~/.platformio/boards
 
     - name: Install library dependencies
